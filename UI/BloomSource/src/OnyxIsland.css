@@ -1,0 +1,458 @@
+@property --timer-progress {
+	syntax: "<number>";
+	inherits: true;
+	initial-value: 0;
+}
+
+html,
+body,
+#root {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	background: transparent;
+	overflow: hidden;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+.onyx-screen {
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	gap: 12px;
+	overflow: visible;
+	font-family: "Segoe UI Variable Text", "Segoe UI", sans-serif;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* Bloom's edge-attached surface and flares form the island as one shape. */
+.bloom.onyx-island {
+	--notch-bg: var(--surface-bg);
+	--surface-bg: rgba(9, 9, 13, 0.78);
+	position: relative;
+	flex: 0 0 auto;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 12px;
+	padding: 0 13px 0 17px;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-top: 0;
+	border-radius: 0 0 24px 24px;
+	color: #f7f5fb;
+	white-space: nowrap;
+	overflow: visible;
+	isolation: isolate;
+	box-shadow: 0 9px 28px rgba(0, 0, 0, 0.2);
+	will-change: width, height, transform, opacity;
+}
+
+.bloom.onyx-timer {
+	justify-content: center;
+	border-radius: 0 0 24px 24px;
+	--surface-bg: rgba(0, 0, 0, .96);
+}
+
+.bloom.onyx-clock {
+	justify-content: center;
+	padding: 0 14px;
+	border-radius: 0 0 18px 18px;
+	color: rgba(249, 247, 255, .88);
+	font-variant-numeric: tabular-nums;
+	font-size: 15px;
+	font-weight: 550;
+	letter-spacing: .015em;
+	cursor: pointer;
+	--surface-bg: rgba(9, 9, 13, .88);
+}
+
+.bloom.onyx-clock:focus-visible { outline: 2px solid #ff9f0a; outline-offset: 3px; }
+
+.onyx-clock time {
+	font-variant-numeric: tabular-nums;
+}
+
+.bloom.onyx-workspace {
+	width: min(560px, calc(100vw - 24px));
+	height: 230px;
+	padding: 24px 24px 18px;
+	border-radius: 0 0 28px 28px;
+	flex-direction: column;
+	align-items: stretch;
+	justify-content: center;
+	gap: 14px;
+	background: rgba(9, 9, 13, .97);
+	box-shadow: 0 16px 48px rgba(0,0,0,.34), 0 0 28px rgba(146,111,255,.12);
+}
+
+.onyx-workspace button {
+	border: 1px solid rgba(255,255,255,.1);
+	border-radius: 12px;
+	background: rgba(255,255,255,.08);
+	color: #f8f7fb;
+	font: inherit;
+	cursor: pointer;
+	transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+.onyx-workspace button:hover:not(:disabled) { transform: translateY(-1px); background: rgba(255,255,255,.15); border-color: rgba(255,255,255,.22); }
+.onyx-workspace button:active:not(:disabled) { transform: scale(.97); }
+.onyx-workspace button:disabled { opacity: .45; cursor: default; }
+.onyx-workspace button:focus-visible, .onyx-workspace input:focus-visible { outline: 2px solid #ffad26; outline-offset: 2px; }
+
+.onyx-clock-workspace { align-items: center !important; }
+.onyx-workspace-time { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.onyx-workspace-time span { color: rgba(255,255,255,.55); font-size: 12px; text-transform: capitalize; }
+.onyx-workspace-time strong { color: white; font-size: 43px; line-height: 1.15; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
+.onyx-workspace-actions { max-width: 500px; display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; }
+.onyx-workspace-actions button { min-width: 96px; padding: 9px 12px; }
+.onyx-workspace-hint { color: rgba(255,255,255,.4); font-size: 10px; }
+
+.onyx-timer-setup { align-items: center !important; }
+.onyx-timer-setup-heading { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.onyx-timer-setup-heading span { font-size: 17px; font-weight: 600; }
+.onyx-timer-setup-heading small, .onyx-timer-setup-status { color: rgba(255,255,255,.48); font-size: 11px; }
+.onyx-timer-presets { display: flex; justify-content: center; gap: 8px; }
+.onyx-timer-presets button { padding: 9px 15px; }
+.onyx-timer-custom { display: flex; align-items: center; gap: 9px; color: rgba(255,255,255,.72); font-size: 12px; }
+.onyx-timer-custom input { width: 76px; padding: 8px; border: 1px solid rgba(255,255,255,.14); border-radius: 9px; background: rgba(255,255,255,.07); color: white; font: inherit; }
+.onyx-timer-custom input[type="time"] { color-scheme: dark; width: 110px; }
+.onyx-timer-custom button { padding: 8px 14px; background: rgba(255,159,10,.2); border-color: rgba(255,159,10,.35); }
+
+.onyx-calendar-workspace { height: 286px !important; display: grid !important; grid-template-columns: 1.15fr 1fr; align-items: center !important; gap: 28px !important; }
+.onyx-calendar-main { display: flex; flex-direction: column; gap: 12px; }
+.onyx-calendar-header { display: flex; align-items: center; justify-content: space-between; text-transform: capitalize; }
+.onyx-calendar-header strong { font-size: 14px; }
+.onyx-calendar-header button { width: 28px; height: 28px; font-size: 20px; line-height: 1; }
+.onyx-calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; }
+.onyx-calendar-grid > * { width: 28px; height: 25px; display: grid; place-items: center; }
+.onyx-calendar-grid .weekday { color: rgba(255,255,255,.42); font-size: 10px; }
+.onyx-calendar-grid button { border: 0; border-radius: 50%; background: transparent; font-size: 11px; }
+.onyx-calendar-grid button.today { box-shadow: inset 0 0 0 1px rgba(255,159,10,.72); }
+.onyx-calendar-grid button.selected { background: #ff9f0a; color: #18130b; font-weight: 700; }
+.onyx-calendar-selection { min-height: 0; display: flex; flex-direction: column; gap: 8px; padding: 14px; border-left: 1px solid rgba(255,255,255,.1); overflow: hidden; }
+.onyx-calendar-selection span { color: rgba(255,255,255,.55); font-size: 11px; text-transform: capitalize; }
+.onyx-calendar-selection strong { font-size: 16px; font-weight: 550; }
+.onyx-calendar-selection small { color: rgba(255,255,255,.35); font-size: 10px; }
+.onyx-calendar-events { min-height: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.onyx-calendar-events > div { min-width: 0; display: grid; grid-template-columns: 38px minmax(0,1fr) 22px; align-items: center; gap: 6px; }
+.onyx-calendar-events time { color: #ffb33e; font-size: 10px; font-variant-numeric: tabular-nums; }
+.onyx-calendar-events strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; font-weight: 500; }
+.onyx-calendar-events button { width: 22px; height: 22px; padding: 0; color: #ff706d; }
+.onyx-calendar-add { display: grid; grid-template-columns: minmax(0, 1fr) 76px 28px; gap: 4px; }
+.onyx-calendar-add input { min-width: 0; width: 100%; height: 28px; padding: 5px 7px; border: 1px solid rgba(255,255,255,.12); border-radius: 7px; background: rgba(255,255,255,.06); color: white; font: inherit; font-size: 10px; }
+.onyx-calendar-add input[type="time"] { color-scheme: dark; }
+.onyx-calendar-add button { height: 28px; padding: 0; background: rgba(255,159,10,.22); border-color: rgba(255,159,10,.38); }
+
+.onyx-controls-workspace { justify-content: flex-start !important; padding: 26px 34px !important; }
+.onyx-controls-main { width: 100%; display: grid; grid-template-columns: 1.25fr 1fr; align-content: center; gap: 17px 26px; }
+.onyx-control-slider label { display: flex; justify-content: space-between; margin-bottom: 10px; color: rgba(255,255,255,.75); font-size: 12px; }
+.onyx-control-slider label b { color: white; font-variant-numeric: tabular-nums; }
+.onyx-control-slider input { width: 100%; accent-color: #ff9f0a; }
+.onyx-control-volume { display: flex; align-items: center; justify-content: flex-end; gap: 8px; color: rgba(255,255,255,.75); font-size: 12px; }
+.onyx-control-volume span { margin-right: auto; }
+.onyx-control-volume button { width: 32px; height: 32px; font-size: 18px; }
+.onyx-control-radios { display: flex; gap: 8px; grid-column: 1 / -1; }
+.onyx-control-radios button { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 10px; font-size: 11px; }
+.onyx-control-radios button.active { border-color: rgba(255,159,10,.5); background: rgba(255,159,10,.14); }
+.onyx-control-radios small { color: rgba(255,255,255,.45); font-size: 9px; }
+.onyx-control-status { min-height: 12px; grid-column: 1 / -1; color: rgba(255,255,255,.42); font-size: 10px; text-align: center; }
+
+@media (max-width: 580px) {
+	.bloom.onyx-workspace { padding-left: 14px; padding-right: 14px; }
+	.onyx-workspace-actions { gap: 5px; }
+	.onyx-workspace-actions button { min-width: 0; padding: 9px 10px; font-size: 11px; }
+	.onyx-calendar-workspace { gap: 8px !important; }
+	.onyx-calendar-selection { padding: 8px; }
+}
+
+.bloom.onyx-timer.is-compact {
+	padding: 0;
+	border-top: 1px solid rgba(255, 255, 255, .08);
+	border-radius: 50%;
+}
+
+.bloom.onyx-stopwatch {
+	justify-content: center;
+	padding: 7px 12px 8px;
+	border-radius: 0 0 24px 24px;
+	--surface-bg: rgba(0, 0, 0, .96);
+}
+
+.bloom.onyx-stopwatch.is-compact {
+	padding: 0;
+	border-radius: 0 0 20px 20px;
+}
+
+.onyx-stopwatch-compact {
+	width: 100%;
+	display: grid;
+	place-items: center;
+	font-variant-numeric: tabular-nums;
+}
+
+.onyx-stopwatch-compact strong {
+	font-size: 15px;
+	line-height: 1;
+	letter-spacing: -.035em;
+	color: #fff;
+}
+
+.onyx-stopwatch-expanded {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	display: grid;
+	grid-template-columns: minmax(110px, 1fr) auto;
+	align-items: center;
+	gap: 10px;
+}
+
+.onyx-stopwatch-reading {
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 2px;
+}
+
+.onyx-stopwatch-reading > span,
+.onyx-stopwatch-reading > small {
+	color: rgba(249, 247, 255, .62);
+	font-size: 10px;
+	line-height: 1.2;
+}
+
+.onyx-stopwatch-reading > strong {
+	color: white;
+	font-size: 28px;
+	line-height: 1;
+	font-weight: 650;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -.045em;
+}
+
+.onyx-stopwatch-controls {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.onyx-stopwatch-controls button {
+	min-width: 34px;
+	height: 34px;
+	padding: 0 9px;
+	border: 1px solid rgba(255, 255, 255, .1);
+	border-radius: 999px;
+	background: rgba(255, 255, 255, .12);
+	color: white;
+	font: 600 11px/1 "Segoe UI Variable Text", "Segoe UI", sans-serif;
+	cursor: pointer;
+	transition: transform .15s ease, background-color .15s ease;
+}
+
+.onyx-stopwatch-controls button:first-child {
+	width: 36px;
+	padding: 0;
+	font-size: 15px;
+}
+
+.onyx-stopwatch-controls button:hover:not(:disabled) { transform: scale(1.06); background: rgba(255, 255, 255, .22); }
+.onyx-stopwatch-controls button:active:not(:disabled) { transform: scale(.94); }
+.onyx-stopwatch-controls button:disabled { opacity: .42; cursor: default; }
+.onyx-stopwatch-controls button:focus-visible { outline: 2px solid white; outline-offset: 2px; }
+.onyx-stopwatch-controls .stopwatch-close { min-width: 30px; padding: 0; color: #ff625e; background: rgba(255, 69, 58, .18); font-size: 20px; }
+
+.onyx-stopwatch-laps {
+	position: absolute;
+	left: 8px;
+	right: 8px;
+	bottom: -2px;
+	display: flex;
+	justify-content: center;
+	gap: 8px;
+	color: rgba(249, 247, 255, .48);
+	font-size: 8px;
+	font-variant-numeric: tabular-nums;
+}
+
+.onyx-stopwatch-laps b { color: rgba(249, 247, 255, .82); font-weight: 500; }
+
+.onyx-message {
+	position: relative;
+	flex: 1 1 auto;
+	min-width: 0;
+	padding-top: 1px;
+	overflow: hidden;
+	color: rgba(249, 247, 255, 0.96);
+	font-size: 13px;
+	font-weight: 500;
+	letter-spacing: 0.01em;
+	text-overflow: ellipsis;
+}
+
+.onyx-orb {
+	position: relative;
+	flex: 0 0 24px;
+	width: 24px;
+	height: 24px;
+	display: grid;
+	place-items: center;
+	filter: drop-shadow(0 0 4px rgba(146, 111, 255, 0.22));
+}
+
+.onyx-orb canvas {
+	display: block;
+}
+
+.onyx-message.timer-message {
+	display: flex;
+	align-items: baseline;
+	justify-content: center;
+	gap: 12px;
+	font-size: 12px;
+	color: rgba(249, 247, 255, 0.68);
+}
+
+.timer-message strong {
+	font-size: 25px;
+	line-height: 1;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -0.04em;
+	color: #fff;
+}
+
+.timer-message.is-compact {
+	flex: 0 0 auto;
+	justify-content: center;
+	padding: 0;
+	font-size: 11px;
+	color: #fff;
+}
+
+.timer-message.is-compact strong {
+	font-size: 12px;
+	letter-spacing: -.03em;
+}
+
+.onyx-timer-controls {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 16px;
+	pointer-events: none;
+}
+
+.onyx-timer-controls button {
+	width: 30px;
+	height: 30px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.14);
+	color: white;
+	font-size: 16px;
+	font-weight: 700;
+	cursor: pointer;
+	pointer-events: auto;
+	transition: transform .16s ease, background-color .16s ease;
+}
+
+.onyx-timer-controls:not(.is-alarm) button:last-child { background: rgba(255, 69, 58, .3); font-size: 22px; }
+.onyx-timer-controls:not(.is-alarm) .onyx-timer-add { background: rgba(255,255,255,.09); font-size: 18px; }
+.onyx-timer-controls:not(.is-alarm) .onyx-timer-pause { background: rgba(255,255,255,.14); }
+.onyx-timer-controls button:hover { transform: scale(1.08); background-color: rgba(255,255,255,.24); }
+.onyx-timer-controls button:active { transform: scale(.92); }
+.onyx-timer-controls button:focus-visible { outline: 2px solid white; outline-offset: 2px; }
+.onyx-timer-controls.is-alarm { justify-content: flex-end; }
+.onyx-timer-controls .onyx-alarm-stop {
+	width: auto;
+	min-width: 76px;
+	padding: 0 11px;
+	border-radius: 999px;
+	background: #b92c36;
+	font-size: 10px;
+	letter-spacing: .04em;
+}
+.onyx-timer-controls .onyx-alarm-stop:hover { background: #dc3540; }
+
+.onyx-timer,
+.onyx-alarm {
+	--surface-bg: rgba(12, 12, 16, .94) !important;
+	border-color: color-mix(in srgb, var(--bloom-accent, #9b7cff) 72%, transparent) !important;
+	box-shadow: 0 0 14px color-mix(in srgb, var(--bloom-accent, #9b7cff) 34%, transparent), 0 9px 28px rgba(0,0,0,.24) !important;
+}
+
+.onyx-alarm {
+	box-shadow: 0 0 18px rgba(220, 50, 55, .32), 0 9px 28px rgba(0,0,0,.24) !important;
+}
+
+.onyx-timer::after,
+.onyx-alarm::after {
+	content: "";
+	position: absolute;
+	inset: 2px;
+	border: 3px solid transparent;
+	border-radius: 0 0 22px 22px;
+	background: conic-gradient(from 0deg, #ff9f0a calc(var(--timer-progress, 0) * 1turn), transparent 0) border-box;
+	-webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+	-webkit-mask-composite: xor;
+	mask-composite: exclude;
+	filter: drop-shadow(0 0 4px rgba(255, 159, 10, .65));
+	pointer-events: none;
+}
+
+.onyx-timer.is-compact::after {
+	border-radius: 50%;
+}
+
+.onyx-timer-mini {
+	flex: 0 0 56px !important;
+	padding: 0 !important;
+	justify-content: center !important;
+	cursor: pointer;
+	font-variant-numeric: tabular-nums;
+	transition: --timer-progress 1s linear;
+}
+.onyx-timer-mini strong { position: relative; z-index: 1; color: #fff; font-size: 11px; font-weight: 650; letter-spacing: -.035em; }
+
+.onyx-orb-dock {
+	flex: 0 0 44px;
+	width: 44px;
+	height: 44px;
+	display: grid;
+	place-items: center;
+	margin-top: 1px;
+	border: 1px solid rgba(255, 255, 255, .1);
+	border-radius: 50%;
+	background: rgba(9, 9, 13, .9);
+	box-shadow: 0 0 16px rgba(146, 111, 255, .16), 0 7px 22px rgba(0, 0, 0, .24);
+	pointer-events: none;
+}
+
+.orb-processing {
+	filter: drop-shadow(0 0 6px rgba(146, 111, 255, 0.42));
+}
+
+.onyx-error {
+	--surface-bg: rgba(43, 18, 26, 0.84) !important;
+	border-color: rgba(222, 92, 111, 0.3) !important;
+	box-shadow: 0 8px 28px rgba(91, 23, 39, 0.24), 0 0 18px rgba(193, 59, 83, 0.1) !important;
+}
+
+.onyx-error .onyx-orb {
+	filter: drop-shadow(0 0 5px rgba(203, 61, 83, 0.36));
+}
+
+.orb-success {
+	filter: drop-shadow(0 0 6px rgba(153, 111, 255, 0.42));
+}

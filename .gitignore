@@ -1,0 +1,6 @@
+models/vosk-model-it-0.22/
+.venv/
+__pycache__/
+*.pyc
+logs/
+Screenshot/
