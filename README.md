@@ -98,7 +98,7 @@ Per confrontare il riconoscimento libero con la grammatica ristretta alla parola
 .\.venv\Scripts\python.exe .\Azioni\calibra_vosk.py --grammatica-onix
 ```
 
-Per provare la frase più distintiva “Ehi Onix”, usa invece:
+Per provare la frase più distintiva “Onix”, usa invece:
 
 ```powershell
 .\.venv\Scripts\python.exe .\Azioni\calibra_vosk.py --grammatica-ehi-onix
@@ -110,7 +110,7 @@ Per provare il modello italiano completo dopo averlo scaricato ed estratto:
 .\.venv\Scripts\python.exe .\Azioni\calibra_vosk.py --modello .\Modelli\vosk-model-it-0.22
 ```
 
-Fai prove pronunciando “Ehi Onix” e poi parlando normalmente senza chiamarlo. La modalità ristretta può forzare l’ipotesi anche su parole diverse: serve solo a valutare il compromesso tra riconoscimenti corretti e falsi allarmi, non è ancora il rilevatore definitivo.
+Fai prove pronunciando “Onix” e poi parlando normalmente senza chiamarlo. La modalità ristretta può forzare l’ipotesi anche su parole diverse: serve solo a valutare il compromesso tra riconoscimenti corretti e falsi allarmi, non è ancora il rilevatore definitivo.
 
 Pronuncia “Onyx” più volte, lasciando una breve pausa tra le chiamate. Annota le trascrizioni stampate; premi `Ctrl+C` per terminare. Questo strumento è intenzionalmente visibile nel terminale per poter osservare i risultati.
 
