@@ -8,7 +8,10 @@ from openwakeword.model import Model
 BASE_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(BASE_DIR))
 
-from engine import action
+import action
+
+if __name__ == "__main__":
+    raise SystemExit(action.main())
 
 MODEL_PATH = BASE_DIR / "models" / "onyx.onnx"
 
