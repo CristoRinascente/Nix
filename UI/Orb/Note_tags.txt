@@ -1,0 +1,27 @@
+funzioni tags_animations: (da aggiungere alla build Orb)
+collegamento alla funzione done: -testo: fatto, done, ok, ricevuto. -simbolo: check. -colore: verde smeraldo.
+
+collegamento alla funzione notunderstand: -testo: riprova, non ho capito, come?, ripeti. -simbolo: allert. -colore: Arancione caldo.
+
+collegamento alla funzione rest: -testo: aspetto, ricevuto, ok, attendo. -simbolo: "..." (tre puntini mezz'aria). -colore: grigio neutro. 
+
+collegamento alla funzione exit: -testo: no. -simbolo: no. -colore: no.
+
+Funzione -Animazioni entrata: Una pallina esce (scendendo) dal orb con una distanza relativamente corta. Appare nel pallino il simbolo stille scrittura e si espande a pillola, a pillola espansa il testo ruota.
+
+Funzione -Animazione uscita: si chiude a pallina e rientra nel Orb (salendo).
+
+/-----Caratteristiche grafiche nel dettaglio tag------/
+Forma e Struttura: Badge a capsula/pillola (pill-shaped) con angoli completamente arrotondati, bordo sottile (outline) e layout orizzontale fisso (icona a sinistra, testo a destra).
+
+Tipografia: Font sans-serif moderno, pulito e ben leggibile (medium/semibold weight), dello stesso preciso colore del bordo e dell'icona di appartenenza.
+
+Iconografia: Simboli chiari racchiusi in piccoli elementi geometrici pieni (cerchi o poligoni) con la silhouette bianca al centro:
+Alert: Triangolo arancione con punto esclamativo.
+
+/------------------------------------------/
+
+Solo con l’orb visibile: un tag mandato mentre l’orb è nascosto, o sta ancora entrando, viene ignorato.
+Se non vedi il testo o ricevi un messaggio sul font, controlla che in build/assets/ ci sia InterTight-SemiBold.ttf (la copia la fa CMake alla build).
+Regolazioni facili: kTagHold (secondi di permanenza), kTagY (distanza della pillola dall’orb), kFontSize (grandezza del testo) e i colori in kTagCols.
+Un avviso onesto: questa è la parte più delicata del progetto (forme, simboli, testo e flip dentro uno shader) e non posso vederla girare. Se qualcosa risulta storto, ad esempio il flip troppo veloce, i simboli fuori centro o il glossy troppo debole, dimmi che cosa vedi e sistemo il numero giusto.

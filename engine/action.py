@@ -16,6 +16,7 @@ import threading
 import time
 import urllib.parse
 import uuid
+from collections import deque
 from datetime import datetime
 from pathlib import Path
 
@@ -28,8 +29,15 @@ from openwakeword.model import Model as WakeModel
 ROOT = Path(__file__).resolve().parent.parent
 MODEL_PATH = ROOT / "models" / "vosk-model-it-0.22"
 WAKE_MODEL_PATH = ROOT / "models" / "onyx.onnx"
-WAKE_THRESHOLD = 0.7
+WAKE_THRESHOLD = 0.75
 WAKE_COOLDOWN_SECONDS = 1.0
+WAKE_VERIFY_SECONDS = 2.0
+WAKE_TRANSCRIPT_MEMORY_SECONDS = 1.0
+WAKE_MAX_LEADING_TOKENS = 2
+WAKE_LEADING_TOKENS = {
+    "a", "ah", "aix", "allora", "beh", "e", "eh", "ehi", "ei", "hei",
+    "hey", "hi", "o", "oh", "ok", "okay",
+}
 CONTROL_POLL_SECONDS = 0.25
 SAMPLE_RATE = 16_000
 BLOCK_SIZE = 1_280
@@ -477,13 +485,24 @@ def wake_transcription(text: str) -> bool:
     return tuple(tokens) in WAKE_TRANSCRIPTIONS
 
 
-def wake_command_tail(text: str) -> str | None:
+def wake_command_tail(text: str, *, allow_leading: bool = False) -> str | None:
     """Return the words spoken after a recognized wake phrase, if present."""
     tokens = tuple(re.findall(r"[a-zà-öø-ÿ]+", text.casefold()))
-    for phrase in sorted(WAKE_TRANSCRIPTIONS, key=len, reverse=True):
-        if tokens[:len(phrase)] == phrase:
-            return " ".join(tokens[len(phrase):])
+    max_start = WAKE_MAX_LEADING_TOKENS if allow_leading else 0
+    for start in range(min(max_start + 1, len(tokens) + 1)):
+        # Consenti solo riempitivi iniziali noti, non parole qualsiasi:
+        # evita che "apri unix" venga interpretato come una chiamata.
+        if start and any(token not in WAKE_LEADING_TOKENS for token in tokens[:start]):
+            break
+        for phrase in sorted(WAKE_TRANSCRIPTIONS, key=len, reverse=True):
+            if tokens[start : start + len(phrase)] == phrase:
+                return " ".join(tokens[start + len(phrase) :])
     return None
+
+
+def wake_phrase_heard(text: str) -> bool:
+    """True se Vosk ha trascritto la parola di attivazione, anche con un riempitivo iniziale."""
+    return wake_command_tail(text, allow_leading=True) is not None
 
 
 def timer_control_intent(text: str) -> str | None:
@@ -1147,6 +1166,9 @@ def run_listener(model_path: Path, ui_events: queue.Queue[tuple[str, str | None]
     command_mode = False
     last_partial = ""
     wake_cooldown_until = 0.0
+    wake_pending_until = 0.0
+    strip_wake_prefix = False
+    recent_transcripts: deque[tuple[float, str]] = deque()
     last_control_poll = 0.0
     error_cue_echo_guard_until = 0.0
     timers: list[threading.Timer] = []
@@ -1214,6 +1236,26 @@ def run_listener(model_path: Path, ui_events: queue.Queue[tuple[str, str | None]
             if not succeeded:
                 ui_events.put(("error", response))
 
+    def activate_wake() -> None:
+        nonlocal command_mode, wake_pending_until, strip_wake_prefix, last_partial, wake_activations
+        command_mode = True
+        wake_pending_until = 0.0
+        strip_wake_prefix = True
+        last_partial = ""
+        wake_activations += 1
+        recent_transcripts.clear()
+        ui_events.put(("wake", None))
+        print("Onyx rilevato. Ascolto comando attivo; dì ‘niente’ per annullare.\n", flush=True)
+
+    def wake_phrase_in_recent_transcripts(reference_time: float) -> bool:
+        if not recent_transcripts:
+            return False
+        timestamp, text = recent_transcripts[-1]
+        return (
+            reference_time - timestamp <= WAKE_TRANSCRIPT_MEMORY_SECONDS
+            and wake_phrase_heard(text)
+        )
+
     def dispatch_command(text: str) -> bool:
         nonlocal recognized_commands, error_cue_echo_guard_until
         recognized_commands += 1
@@ -1269,18 +1311,34 @@ def run_listener(model_path: Path, ui_events: queue.Queue[tuple[str, str | None]
                     last_control_poll = now
                     process_alarm_control()
                     process_ui_timer_start()
-                if not command_mode and now >= wake_cooldown_until:
+                if wake_pending_until and now >= wake_pending_until:
+                    wake_pending_until = 0.0
+                    print("Attivazione ignorata: Vosk non ha sentito ‘Onyx’.", flush=True)
+                # openWakeWord propone l'attivazione, ma Vosk deve confermare
+                # di aver sentito "Onyx": evita che la sola voce apra Onyx.
+                if (
+                    not command_mode
+                    and not wake_pending_until
+                    and now >= wake_cooldown_until
+                ):
                     scores = wake_model.predict(np.frombuffer(audio, dtype=np.int16))
                     if scores and max(scores.values()) >= WAKE_THRESHOLD:
                         wake_model.reset()
                         wake_cooldown_until = now + WAKE_COOLDOWN_SECONDS
-                        wake_activations += 1
-                        command_mode = True
-                        last_partial = ""
-                        recognizer.Reset()
-                        ui_events.put(("wake", None))
-                        print("Onyx rilevato. Ascolto comando attivo; dì ‘niente’ per annullare.\n", flush=True)
-                        continue
+                        wake_pending_until = now + WAKE_VERIFY_SECONDS
+                        partial_snapshot = (
+                            json.loads(recognizer.PartialResult()).get("partial", "").strip()
+                        )
+                        if wake_phrase_heard(partial_snapshot) or (
+                            not partial_snapshot and wake_phrase_in_recent_transcripts(now)
+                        ):
+                            activate_wake()
+                        else:
+                            print(
+                                f"Possibile ‘Onyx’ rilevato (punteggio {max(scores.values()):.3f}): "
+                                "verifico la trascrizione Vosk...",
+                                flush=True,
+                            )
                 complete_utterance = recognizer.AcceptWaveform(audio)
                 if dropped_audio_blocks and (
                     last_drop_warning == 0 or dropped_audio_blocks - last_drop_warning >= 10
@@ -1291,16 +1349,23 @@ def run_listener(model_path: Path, ui_events: queue.Queue[tuple[str, str | None]
                         flush=True,
                     )
                     last_drop_warning = dropped_audio_blocks
-                if command_mode and not complete_utterance:
-                    partial_text = json.loads(recognizer.PartialResult()).get("partial", "").strip()
-                    if (
-                        time.monotonic() < error_cue_echo_guard_until
-                        and is_error_cue_echo(partial_text)
-                    ):
-                        continue
-                    if partial_text and partial_text != last_partial:
-                        last_partial = partial_text
-                        ui_events.put(("partial", partial_text))
+                if not complete_utterance:
+                    if command_mode:
+                        partial_text = json.loads(recognizer.PartialResult()).get("partial", "").strip()
+                        if (
+                            time.monotonic() < error_cue_echo_guard_until
+                            and is_error_cue_echo(partial_text)
+                        ):
+                            continue
+                        if partial_text and partial_text != last_partial:
+                            last_partial = partial_text
+                            ui_events.put(("partial", partial_text))
+                    elif wake_pending_until:
+                        partial_text = json.loads(recognizer.PartialResult()).get("partial", "").strip()
+                        if partial_text and wake_phrase_heard(partial_text):
+                            activate_wake()
+                            last_partial = partial_text
+                            ui_events.put(("partial", partial_text))
                     continue
                 if complete_utterance:
                     text = json.loads(recognizer.Result()).get("text", "").strip()
@@ -1320,10 +1385,24 @@ def run_listener(model_path: Path, ui_events: queue.Queue[tuple[str, str | None]
                         print("Ignoro l'eco audio di ‘Non ho capito’.", flush=True)
                         last_partial = ""
                         continue
+                    if not command_mode:
+                        recent_transcripts.append((time.monotonic(), text))
+                        while (
+                            recent_transcripts
+                            and time.monotonic() - recent_transcripts[0][0]
+                            > WAKE_TRANSCRIPT_MEMORY_SECONDS
+                        ):
+                            recent_transcripts.popleft()
+                        if wake_pending_until and wake_phrase_heard(text):
+                            activate_wake()
                     recognized_utterances += 1
                     stamp = datetime.now().astimezone().strftime("%H:%M:%S")
                     print(f"[{stamp}] Ho sentito: {text}", flush=True)
-                    wake_tail = wake_command_tail(text)
+                    if strip_wake_prefix:
+                        wake_tail = wake_command_tail(text, allow_leading=True)
+                        strip_wake_prefix = False
+                    else:
+                        wake_tail = wake_command_tail(text)
                     if wake_tail is not None:
                         if not wake_tail:
                             continue

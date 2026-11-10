@@ -1,0 +1,2 @@
+C:/Users/cris1/Desktop/Nix/build/CMakeFiles/edit_cache.dir
+C:/Users/cris1/Desktop/Nix/build/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,48 @@
+### Caratteristiche dello Stile
+
+* **Geometria & Materiale:** Nero assoluto (`#000000`), raggio di curvatura *squircle* (curva continua stile Apple). Opacità 100% per mimetizzarsi con l'hardware.
+* **Fisica di Movimento:** Easing di tipo *Spring* (molla con alta tensione e minimo *bounce*). Durata animazioni compresa tra $200\text{ms}$ e $350\text{ms}$.
+* **Morphing del Contenuto:** Dissolvenza incrociata (*cross-fade*) degli elementi interni sincronizzata alla variazione di scala della struttura.
+
+---
+
+### Divisione Funzioni & Animazioni
+
+#### `on_notch()`
+
+* **Scopo:** Far apparire la notch in versione pillola/ridotta partendo dal bordo superiore.
+* **Animazione:**
+* **Traslazione $Y$:** Da $-100\%$ (nascosta fuori schermo) a $0$ (posizione finale).
+* **Scale $Y$:** Effetto stretching iniziale ($1.2 \rightarrow 1.0$) per simulare la discesa di un fluido.
+* **Opacità:** Fade-in rapido da $0\%$ a $100\%$ nei primi $50\text{ms}$.
+* **Contenuto:** Icone minimali (es. fotocamera/LED) che compaiono con un micro-scale in ritardo di $50\text{ms}$ (*stagger effect*).
+
+
+
+#### `big_notch()`
+
+* **Scopo:** Espandere la notch per mostrare dettagli, notifiche o controlli estesi.
+* **Animazione:**
+* **Ridimensionamento (Width & Height):** Espansione fluida sull'asse $X$ e $Y$ fino alle dimensioni target del widget.
+* **Border Radius:** Modifica dinamica del raggio degli angoli per mantenere le proporzioni visive durante l'ingrandimento.
+* **Transizione Contenuto:** Dissolvenza in uscita rapida degli elementi ridotti e contestuale fade-in + scaling ($0.95 \rightarrow 1.0$) dell'interfaccia complessa.
+
+
+
+#### `smal_notch()`
+
+* **Scopo:** Riportare la notch alla forma compattata iniziale dopo un'interazione o notifica.
+* **Animazione:**
+* **Contrazione (Width & Height):** Decellerazione rapida della struttura verso i valori originali della pillola base.
+* **Border Radius:** Ripristino immediato del raggio standard.
+* **Transizione Contenuto:** Collasso del contenuto esteso verso il centro e ricomparsa delle icone compattate con effetto *spring*.
+
+
+
+#### `leave_notch()`
+
+* **Scopo:** Rimuovere completamente la notch dallo schermo.
+* **Animazione:**
+* **Traslazione $Y$:** Rientro verso l'alto ($0 \rightarrow -100\%$) fino a scomparire nella cornice del display.
+* **Scale $X$ & $Y$:** Rimpicciolimento progressivo per simulare il riassorbimento nel bordo.
+* **Opacità:** Fade-out finale verso $0\%$ negli ultimi $100\text{ms}$.

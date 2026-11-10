@@ -1,0 +1,50 @@
+1.  Vosk si carica subito a programma aviato. Deve essere carricato solo dopo aver detto onyx.
+
+2.  Non deve avere la doppia verifica di vosk per partire l'assistente vocale.
+
+3.  Fix icona barra strumenti
+
+4.  Re-integrare il file .exe
+
+Sostituire Bloom con uno proprio.
+
+funzioni:
+-rest: 
+-notunderstand
+-done
+-exit
+
+funzioni script:
+-done: al eseguimento del comando
+-notunderstand: il comando non è stato capito
+
+funzioni vocali:
+-rest: resta, aspetta, stai, un momento: Onyx rimane attivo esegue poi una azione detta in un secondo momento.
+-exit: niente, stop, esci, lascia stare, zitto. Onyx esce.
+
+funzioni notch:
+attivazione: scendere un flusso scuro e glossy dai lati dello schermo.
+uscit
+
+funzioni tag:
+collegamento alla funzione done: -testo: fatto, done, ok, ricevuto. -simbolo: check. -colore: verde smeraldo.
+
+collegamento alla funzione notunderstand: -testo: riprova, non ho capito, come?, ripeti. -simbolo: allert. -colore: Arancione caldo.
+
+collegamento alla funzione rest: -testo: aspetto, ricevuto, ok, attendo. -simbolo: "..." (tre puntini mezz'aria). -colore: grigio neutro. 
+
+collegamento alla funzione exit: -testo: no. -simbolo: no. -colore: no.
+
+Funzione -Animazioni entrata: Una pallina esce scendendo dal orb con una distanza relativamente corta. Appare nel pallino il simbolo stille scrittura e si espande a pillola, a pillola espansa il testo ruota.
+
+Funzione -Animazione uscita: si chiude a pallina e rientra nel Orb (salendo).
+
+/-----Caratteristiche grafiche nel dettaglio tag------/
+Forma e Struttura: Badge a capsula/pillola (pill-shaped) con angoli completamente arrotondati, bordo sottile (outline) e layout orizzontale fisso (icona a sinistra, testo a destra).
+
+Tipografia: Font sans-serif moderno, pulito e ben leggibile (medium/semibold weight), dello stesso preciso colore del bordo e dell'icona di appartenenza.
+
+Iconografia: Simboli chiari racchiusi in piccoli elementi geometrici pieni (cerchi o poligoni) con la silhouette bianca al centro:
+Alert: Triangolo arancione con punto esclamativo.
+
+/------------------------------------------/

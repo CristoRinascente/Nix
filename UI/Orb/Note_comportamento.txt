@@ -1,0 +1,13 @@
+
+Script dentro env.
+
+funzione animazione:
+-esecuzione comando in corso: sguardo fa destra e sinistra gli occhi si rimpicioliscono dinamicamente al oO sul lato destro e Oo sul lato sinistro, guarda in alto in certi casi.
+
+-attesa comando: quando viene fatta partire la funzione rest(), gli occhi girano casualmente chiudendosi parzialmente sempre a caso. Certe volte fa girare gli occhi a cerchio una rotazione. 
+
+eye_roll(): Rotazione completa a 360° degli occhi. rarita 25%
+
+rest(): Oscillazione sinusoidale in loop (effetto respiro/fluttuazione) con sguardi casuali e ammiccamenti a intervalli irregolari. rarita 
+
+stare_down(): Zoom rapido dell'orb verso lo schermo (+30%), occhi giganti dilatati bloccati sul mouse durata un secondo. rarita 15%

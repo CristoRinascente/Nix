@@ -1,0 +1,3 @@
+C:\msys64\ucrt64\bin\cmake.exe -E rm -f CMakeFiles\orb.dir/objects.a
+C:\msys64\ucrt64\bin\ar.exe qc CMakeFiles\orb.dir/objects.a @CMakeFiles\orb.dir\objects1.rsp
+C:\msys64\ucrt64\bin\g++.exe -g -Wl,--whole-archive CMakeFiles\orb.dir/objects.a -Wl,--no-whole-archive -o orb.exe -Wl,--out-implib,liborb.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\orb.dir\linkLibs.rsp
